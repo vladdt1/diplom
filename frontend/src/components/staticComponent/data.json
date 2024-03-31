@@ -1,0 +1,48 @@
+{
+  "array0": [
+    {
+      "id": "profile",
+      "photo": "profile.svg",
+      "name": "Профиль",
+      "route": "Profile"
+    },
+    {
+      "id": "my-card",
+      "photo": "book.svg",
+      "name": "Моя карточка",
+      "route": "Mybooks"
+    },
+    {
+      "id": "search",
+      "photo": "search.svg",
+      "name": "Поиск",
+      "route": "Search"
+    }
+  ],
+  "array1": [
+    {
+      "id": "students",
+      "photo": "profile.svg",
+      "name": "Студенты",
+      "route": "Students"
+    },
+    {
+      "id": "reservation",
+      "photo": "book.svg",
+      "name": "Заявки",
+      "route": "Reservation"
+    },
+    {
+      "id": "search",
+      "photo": "search.svg",
+      "name": "Поиск",
+      "route": "Search"
+    },
+    {
+      "id": "add-book",
+      "photo": "bookAdd.svg",
+      "name": "Добавить книгу",
+      "route": "AddBook"
+    }
+  ]
+}
