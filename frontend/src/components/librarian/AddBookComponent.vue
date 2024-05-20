@@ -15,6 +15,14 @@
         <br>
         <input type="text" id="article" v-model="bookData.article" required class="addbook-card-input">
         <br>
+        <label for="ydk" class="addbook-card-text">УДК</label>
+        <br>
+        <input type="text" id="ydk" v-model="bookData.ydk" required class="addbook-card-input">
+        <br>
+        <label for="bbk" class="addbook-card-text">ББК</label>
+        <br>
+        <input type="text" id="bbk" v-model="bookData.bbk" required class="addbook-card-input">
+        <br>
         <label for="description" class="addbook-card-text">Описание</label>
         <br>
         <textarea id="description" v-model="bookData.description" required class="addbook-card-input addbook-card-textarea"></textarea>
@@ -24,9 +32,17 @@
         <br>
         <input type="text" id="publisher" v-model="bookData.publisher" required class="addbook-card-input addbook-card-len">
         <br>
+        <label for="recommended" class="addbook-card-text">Кому рекомендовано</label>
+        <br>
+        <input type="text" id="recommended" v-model="bookData.recommended" required class="addbook-card-input addbook-card-len">
+        <br>
         <label for="counter" class="addbook-card-text">Количество книг</label>
         <br>
         <input type="text" id="counter" v-model="bookData.counter" required class="addbook-card-input">
+        <br>
+        <label for="page" class="addbook-card-text">Количество страниц</label>
+        <br>
+        <input type="text" id="page" v-model="bookData.page" required class="addbook-card-input">
         <br>
         <label for="image" class="addbook-card-text">Фотография обложки</label>
         <br>
@@ -64,6 +80,10 @@ export default {
         description: '',
         article: '',
         counter: '',
+        ydk: '',
+        recommended: '',
+        bbk: '',
+        page: '',
         image: null,
       },
       showModal: false,
@@ -91,6 +111,10 @@ export default {
         formData.append('article', this.bookData.article);
         formData.append('counter', this.bookData.counter);
         formData.append('image', this.bookData.image);
+        formData.append('page', this.bookData.page);
+        formData.append('ydk', this.bookData.ydk);
+        formData.append('bbk', this.bookData.bbk);
+        formData.append('recommended', this.bookData.recommended);
 
         await axios.post('http://localhost:8000/cv/addbook', formData, {
           headers: {
@@ -107,6 +131,10 @@ export default {
           description: '',
           counter: '',
           article: '',
+          ydk: '',
+          recommended: '',
+          bbk: '',
+          page: '',
           image: null,
         };
 

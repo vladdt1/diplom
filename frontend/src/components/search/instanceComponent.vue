@@ -4,9 +4,11 @@
         <p class="section-title">Экземпляры</p>
         <ul class="inventory-list">
           <li v-for="one in info.inventoryNumbers" :key="one">
-            {{ one }}
+            {{ shouldDisplayReturn(one) }}
             <button class="inventory-button" @click="infoInstance(one)">Информация</button>
-        </li>
+            <button v-if="shouldDisplayReturnButton(one)" class="inventory-button-red" @click="deleteInstance(one)">Списать</button>
+            <button v-if="shouldDisplayReturnButton(one) == false" class="inventory-button-red" @click="returnedInstance(one)">Вернуть списанное</button>
+          </li>
         </ul>
       </div>
       <div class="book-requests">
@@ -20,18 +22,20 @@
           <table>
             <thead>
                 <tr>
-                    <th>Логин студента</th>
-                    <th>Дата возврата</th>
+                    <th>ФИО студента</th>
+                    <th>Дата</th>
+                    <th>Статус</th>
                 </tr>
             </thead>
             <tbody v-for="one in limitedDetalInfo" :key="one">
                 <tr>
                     <td>
                         <router-link :to="'/search-student/' + one.customer_id" class="black-text">
-                            {{one.login}}
+                            {{one.customer_fio}}
                         </router-link>
                     </td>
                     <td>{{one.returned_date}}</td>
+                    <td>{{one.status}}</td>
                 </tr>
             </tbody>
             <div v-if="detalInfo.length > itemsToShow" class="modal-content-button">
@@ -43,61 +47,123 @@
           </div>
         </div>
       </div>
+      <div v-if="showModal" class="modal">
+        <div class="modal-content">
+          <p class="modal-content-text">Экзмепляр успешно списан</p>
+          <button @click="closeModall">OK</button>
+        </div>
+      </div>
+      <div v-if="showModall" class="modal">
+        <div class="modal-content">
+          <p class="modal-content-text">Экзмепляр успешно востановлен</p>
+          <button @click="closeModalll">OK</button>
+        </div>
+      </div>
     </div>
   </template>
   
   <script>
   import axios from 'axios';
+  
   export default {
     data() {
       return {
-        info: [],
+        info: { inventoryNumbers: [], requests: [] },
         ModalOpen: false,
+        showModal: false,
+        showModall: false,
         detalInfo: [],
         itemsToShow: 0,
       };
     },
     computed: {
-        limitedDetalInfo() {
-            return this.detalInfo.slice(0, this.itemsToShow);
-        }
+      limitedDetalInfo() {
+        return this.detalInfo.slice(0, this.itemsToShow);
+      }
     },
     created() {
       this.instance();
     },
     methods: {
-        showMore() {
-            this.itemsToShow += 5;
-        },
+      showMore() {
+        this.itemsToShow += 5;
+      },
       async instance() {
         try {
           const response = await axios.post('http://localhost:8000/cv/searchBooks/instanceBook', {
             titleId: this.$route.params.id,
           });
           this.info = response.data;
-        } catch(error) {
+        } catch (error) {
           console.error('Ошибка поиска экземпляров книги:', error);
         }
       },
-      closeModal(){
+      closeModal() {
         this.ModalOpen = false;
       },
-      async infoInstance(one){
+      closeModall() {
+        this.showModal = false;
+      },
+      closeModalll() {
+        this.showModall = false;
+      },
+      async infoInstance(one) {
+        const inventoryNumber = one.slice(0, -1);
         this.itemsToShow = 4;
         this.ModalOpen = true;
         try {
           const response = await axios.post('http://localhost:8000/cv/searchBooks/searchInstanceOneBook', {
-            titleId: one,
+            titleId: inventoryNumber,
           });
           this.detalInfo = response.data;
-          console.log(this.detalInfo)
-        } catch(error) {
+        } catch (error) {
           console.error('Ошибка поиска экземпляров книги:', error);
         }
-      }
+      },
+      async returnedInstance(one){
+        const inventoryNumber = one.slice(0, -1);
+        try {
+          await axios.post('http://localhost:8000/cv/searchBooks/returnedBook', {
+            titleId: inventoryNumber,
+          });
+          this.showModall = true;
+          // Обновляем статус в локальных данных
+          const index = this.info.inventoryNumbers.findIndex(item => item === one);
+          if (index !== -1) {
+            this.$set(this.info.inventoryNumbers, index, inventoryNumber + '0');
+          }
+        } catch (error) {
+          console.error('Ошибка при востановлении книги:', error);
+        }
+      },
+      async deleteInstance(one) {
+        const inventoryNumber = one.slice(0, -1);
+        try {
+          await axios.post('http://localhost:8000/cv/searchBooks/deleteBook', {
+            titleId: inventoryNumber,
+          });
+          this.showModal = true;
+          // Обновляем статус в локальных данных
+          const index = this.info.inventoryNumbers.findIndex(item => item === one); 
+          if (index !== -1) {
+            this.$set(this.info.inventoryNumbers, index, inventoryNumber + '4');
+          }
+        } catch (error) {
+          console.error('Ошибка при списании книги:', error);
+        }
+      },
+      shouldDisplayReturn(one) {
+        const str = one.slice(0, -1);
+        return str;
+      },
+      shouldDisplayReturnButton(one) {
+        const lastChar = one.slice(-1);
+        return lastChar !== '4';
+      },
     },
   };
   </script>
+  
   
   <style>
   .book-search-tex {
@@ -127,6 +193,9 @@
   .book-inventory,
   .book-requests {
     flex-basis: 45%;
+  }
+  .inventory-button-red{
+    background-color: red;
   }
   
   .book-inventory {

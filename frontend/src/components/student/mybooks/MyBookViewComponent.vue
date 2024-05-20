@@ -33,7 +33,11 @@
                     </p>
                 </div>
                 <p class="book-search-card-text"><b>Издательство:</b> {{ book.publishing }}</p>
+                <p class="book-search-card-text"><b>Страниц:</b> {{ book.page }}</p>
                 <p class="book-search-card-text"><b>Аннотация:</b> {{ book.annotation }}</p>
+                <p class="book-search-card-text"><b>Кому рекомендовано:</b> {{ book.recommended }}</p>
+                <p class="book-search-card-text"><b>УДК:</b> {{ book.ydk }}</p>
+                <p class="book-search-card-text"><b>ББК:</b> {{ book.bbk }}</p>
             </div>
             <div>
                 <img class="book-search-card-img" v-if="book.path" :src="require(`../../../assets/book/${book.path}`)" alt="book" loading="lazy"/>

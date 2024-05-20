@@ -1,8 +1,9 @@
 <template>
   <div class="ser">
     <div class="search-container">
-      <input type="text" id="searchInput" class="search-container-input" v-model="searchTerm" />
-      <button @click="searchBooks" class="search-container-button">Поиск книг</button>
+      <input type="text" id="searchInput" class="search-container-input" v-model="searchTerm" placeholder="Фамилия автора или название книги"/>
+      <button @click="searchBooks" class="search-container-button">Поиск</button>
+      <button @click="showModal = true" class="search-container-button">Расширенный поиск</button>
     </div>
 
     <div v-if="books.length > 0" class="results-container">
@@ -15,6 +16,7 @@
         <div class="results-container-book-card">
           <p class="results-container-book-card-name">{{ book.title }}</p>
           <p class="results-container-book-card-aftor">Автор: {{ book.autor }}</p>
+          <p class="results-container-book-card-aftor">Издательство: {{ book.publishing  }}</p>
         </div>
       </router-link>
     </div>
@@ -24,7 +26,41 @@
     <div class="search-container-else" v-if="books.length > displayedBooks.length">
       <button @click="loadMoreBooks" class="search-container-button">Показать ещё</button>
     </div>
-    
+
+    <!-- Модальное окно для расширенного поиска -->
+    <div v-if="showModal" class="modal fade show" tabindex="-1" role="dialog" style="display: block;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 20px" class="modal-header">
+            <h2 class="modal-title">Расширенный поиск</h2>
+            <a style="cursor: pointer; width: 40px;" data-dismiss="modal" aria-label="Close" @click="showModal = false">
+              <span style=" width: 40px;font-size: 34px;" aria-hidden="true">&times;</span>
+            </a>
+          </div>
+          <div class="modal-body">
+            <select class="form-control mb-3 select-class" v-model="searchOption">
+              <option disabled value="">Выберите параметр поиска</option>
+              <option value="autor">Автор</option>
+              <option value="title">Название</option>
+              <option value="annotation">Описание</option>
+              <option value="publishing">Издательство</option>
+              <option value="recommended">Рекомендации</option>
+            </select>
+            <input type="text" class="form-control" v-model="searchTerm" placeholder="Введите поисковый запрос">
+            <div style="display: flex; align-items: center;">
+              <p>Год издания с </p> 
+              <input type="text" style="width: 50px; margin: 0 10px;"/> 
+              <p> по </p> 
+              <input type="text" style="width: 50px; margin: 0 10px;"/>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between;" class="modal-footer">
+            <button type="button" style="width: 150px;" class="btn btn-secondary" @click="showModal = false">Закрыть</button>
+            <button type="button" style="width: 150px;" class="btn btn-primary" @click="searchBooksAdvanced">Поиск</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -35,9 +71,11 @@ export default {
   data() {
     return {
       searchTerm: '',
+      searchOption: '',
       books: [],
       displayedBooks: [],
       displayedBookCount: 5,
+      showModal: false,
     };
   },
   async created() {
@@ -85,6 +123,15 @@ export default {
       this.displayedBookCount += 5;
       this.displayedBooks = this.books.slice(0, this.displayedBookCount);
     },
+    async searchBooksAdvanced() {
+      this.showModal = false; // Закрываем модальное окно
+      const response = await axios.post('http://localhost:8000/cv/searchBooks/option', {
+        searchTerm: this.searchTerm,
+        searchOption: this.searchOption
+      });
+      this.books = response.data;
+      this.displayedBooks = this.books.slice(0, this.displayedBookCount);
+    },
   },
 };
 </script>
@@ -97,6 +144,11 @@ export default {
   display: flex;
   justify-content: center; /* Центрируем поисковую строку и кнопку */
   padding: 20px;
+}
+
+.select-class {
+  height: auto; /* или укажите минимальную высоту, например, 38px */
+  padding: 0.375rem 1.75rem 0.375rem 0.75rem; /* Bootstrap стили для padding */
 }
 
 .search-container-input {

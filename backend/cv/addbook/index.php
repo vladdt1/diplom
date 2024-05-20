@@ -2,7 +2,7 @@
 include __DIR__ . '/../../db.php';
 
 // Путь для сохранения файлов
-$uploadPath = '../../../frontend/src/assets/book/';
+$uploadPath = __DIR__ . '/../../../frontend/src/assets/book/';
 
 // Получаем данные из POST-запроса
 $title = $_POST['title'];
@@ -11,6 +11,10 @@ $publisher = $_POST['publisher'];
 $description = $_POST['description'];
 $article = $_POST['article'];
 $counter = $_POST['counter'];
+$page = $_POST['page'];
+$ydk = $_POST['ydk'];
+$bbk = $_POST['bbk'];
+$recommended = $_POST['recommended'];
 
 // Получаем информацию о файле
 $extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
@@ -22,11 +26,11 @@ if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
     // Файл успешно загружен
 
     // SQL-запрос для вставки данных в таблицу books
-    $sql = "INSERT INTO book_title (title_id, title, autor, annotation, count, path, publishing) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO book_title (title_id, title, autor, annotation, count, path, publishing, page, ydk, bbk, recommended) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     // Подготавливаем запрос
     $stmt = $conn->prepare($sql);
     // Привязываем параметры
-    $stmt->bind_param("sssssss", $article, $title, $author, $description, $counter, $fileName, $publisher);
+    $stmt->bind_param("sssssssssss", $article, $title, $author, $description, $counter, $fileName, $publisher, $page, $ydk, $bbk, $recommended);
     // Выполняем запрос
     $stmt->execute();
 
@@ -34,7 +38,7 @@ if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
     $number = 1;
     $inventory_number = $article . '/';
     // SQL-запрос для вставки данных в таблицу
-    $sql = "INSERT INTO book_istance (title_id, status, date_create, inventory_number) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO book_istance (title_id, status, inventory_number) VALUES (?, ?, ?)";
     // Подготавливаем запрос
     $stmt = $conn->prepare($sql);
     // Привязываем параметры
@@ -44,7 +48,7 @@ if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
         // Выполняем запрос в цикле
         $inventory = $inventory_number . $number;
         $number +=1;
-        $stmt->bind_param("ssss", $article, $status, $date, $inventory);
+        $stmt->bind_param("sss", $article, $status, $inventory);
         $stmt->execute();
     }
 

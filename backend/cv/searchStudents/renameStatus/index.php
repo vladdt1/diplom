@@ -57,7 +57,7 @@ if (isset($postData->id) && isset($postData->status) && isset($postData->bookid)
             $date_booking = $currentDate;
 
             $stmt = $conn->prepare("UPDATE book_istance SET title_id = ?, customer_id = ?, status = '3', date_booking = ?, date_return = ? WHERE inventory_number = ? LIMIT 1");
-            $stmt->bind_param("iissi", $bookid, $id, $date_booking, $date_return_plus, $inventory_number);
+            $stmt->bind_param("iisss", $bookid, $id, $date_booking, $date_return_plus, $inventory_number);
             $stmt->execute();
             $stmt->close();
 
@@ -70,10 +70,10 @@ if (isset($postData->id) && isset($postData->status) && isset($postData->bookid)
 
         case 3:
             // Получение данных из таблицы book_istance
-            $stmt = $conn->prepare("SELECT book_id, date_return FROM book_istance WHERE title_id = ? AND customer_id = ? AND status = '3'");
+            $stmt = $conn->prepare("SELECT book_id, date_return, date_booking FROM book_istance WHERE title_id = ? AND customer_id = ? AND status = '3'");
             $stmt->bind_param("ii", $bookid, $id);
             $stmt->execute();
-            $stmt->bind_result($book_id, $date_retur);
+            $stmt->bind_result($book_id, $date_retur, $date_booking);
             $stmt->fetch();
             $stmt->close();
 
@@ -86,7 +86,7 @@ if (isset($postData->id) && isset($postData->status) && isset($postData->bookid)
             // Добавление строки в таблицу returnted_books
             $today = date("Y-m-d");
             
-            $stmt = $conn->prepare("INSERT INTO returnted_books (book_id, customer_id, returned_date, status, delay) VALUES (?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO returnted_books (book_id, customer_id, returned_date, status, delay, date_booking) VALUES (?, ?, ?, ?, ?, ?)");
             if ($today <= $date_retur) {
                 $status = '3';
                 $delay = '0';
@@ -94,7 +94,7 @@ if (isset($postData->id) && isset($postData->status) && isset($postData->bookid)
                 $status = '4';
                 $delay = date_diff(date_create($today), date_create($date_retur))->format('%a') - 1;
             }
-            $stmt->bind_param("iisis", $book_id, $id, $today, $status, $delay);
+            $stmt->bind_param("iisiss", $book_id, $id, $today, $status, $delay, $date_booking);
             $stmt->execute();
             $stmt->close();
             break;

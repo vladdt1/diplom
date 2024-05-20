@@ -10,9 +10,15 @@ if (isset($postData->searchTerm)) {
     $searchTerm = $postData->searchTerm;
 
     // Подготовленный запрос для поиска книг по названию или автору
-    $stmt = $conn->prepare("SELECT * FROM book_title WHERE title LIKE ? OR autor LIKE ?");
-    $likeTerm = "%{$searchTerm}%";
-    $stmt->bind_param("ss", $likeTerm, $likeTerm);
+    $searchTerm = $conn->real_escape_string($searchTerm);
+    $likeTerm = "{$searchTerm}*"; // Добавляем звездочку для поиска по префиксу
+    if (empty($searchTerm)) {
+        // Обработайте случай пустого поискового запроса
+        echo json_encode(["error" => $conn->error]);
+        exit;
+    }
+    $stmt = $conn->prepare("SELECT * FROM book_title WHERE MATCH(title, autor) AGAINST(? IN BOOLEAN MODE)");
+    $stmt->bind_param("s", $likeTerm);
     $stmt->execute();
     $result = $stmt->get_result();
 

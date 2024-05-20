@@ -43,6 +43,12 @@
       "photo": "bookAdd.svg",
       "name": "Добавить книгу",
       "route": "AddBook"
+    },
+    {
+      "id": "statistics",
+      "photo": "graph.svg",
+      "name": "Статистика",
+      "route": "Statistics"
     }
   ]
 }

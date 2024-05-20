@@ -13,14 +13,14 @@ if ($postData && isset($postData->titleId)) {
     ];
 
     // Запрос в таблицу book_istance
-    $sqlBookInstance = "SELECT inventory_number FROM book_istance WHERE title_id = ?";
+    $sqlBookInstance = "SELECT inventory_number, status FROM book_istance WHERE title_id = ?";
     $stmtBookInstance = $conn->prepare($sqlBookInstance);
     $stmtBookInstance->bind_param("i", $postData->titleId);
 
     if ($stmtBookInstance->execute()) {
         $resultBookInstance = $stmtBookInstance->get_result();
         while ($row = $resultBookInstance->fetch_assoc()) {
-            $response['inventoryNumbers'][] = $row['inventory_number'];
+            $response['inventoryNumbers'][] = $row['inventory_number'] . $row['status'];
         }
     } else {
         echo json_encode(["error" => "Ошибка выполнения запроса к таблице book_istance"]);

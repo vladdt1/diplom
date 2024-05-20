@@ -12,6 +12,7 @@ import BookSearchComponent from '@/components/search/BookSearchComponent.vue';
 import MyBookViewComponent from '@/components/student/mybooks/MyBookViewComponent.vue';
 import StudentsComponent from '@/components/librarian/searchStudent/StudentsComponent.vue';
 import AddStudentAndLibrarian from '@/components/administrator/AddStudentAndLibrarian.vue';
+import StatisticsComponent from '@/components/librarian/Statistics/StatisticsComponent.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -78,6 +79,11 @@ const router = createRouter({
       path: '/admin',
       name: 'Admin',
       component: AddStudentAndLibrarian
+    },
+    {
+      path: '/statistics',
+      name: 'Statistics',
+      component: StatisticsComponent
     },
   ],
 });
